@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCA SWARANDHRA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        
+        .page-content {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
+        .login-container {
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px 30px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease;
+            text-align: center;
+        }
+        
+        .input-group {
+            position: relative;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #444;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 14px 45px 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #4285F4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+        }
+        
+        .input-group i {
+            position: absolute;
+            right: 16px;
+            top: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+        
+        .login-button,
+        .logout-button {
+            width: 100%;
+            padding: 14px;
+            background: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        }
+        
+        .login-button:hover,
+        .logout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+            background: #3367D6;
+        }
+        
+        .login-button:active,
+        .logout-button:active {
+            transform: translateY(0);
+        }
+        /* Message box styles */
+        
+        .message-box-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .message-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .message-box-container.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .message-box-container.show .message-box {
+            transform: scale(1);
+        }
+        
+        .message-box h4 {
+            font-size: 20px;
+            color: #d9534f;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .message-box h4 i {
+            margin-right: 10px;
+        }
+        
+        .message-box p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        
+        .message-box button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .message-box button:hover {
+            background-color: #3367D6;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <!-- Main Header -->
+    <header class="bg-blue-800 text-white shadow-md py-4">
+        <div class="container mx-auto px-6 md:px-12 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">BCA SWARANDHRA</h1>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" data-page="home" class="nav-link hover:text-blue-200 transition-colors">Home</a>
+                <a href="#" data-page="dashboard" class="nav-link hover:text-blue-200 transition-colors hidden">Dashboard</a>
+                <a href="#" data-page="admin" class="nav-link hover:text-blue-200 transition-colors hidden">Admin</a>
+                <a href="#" data-page="login" class="nav-link hover:text-blue-200 transition-colors">Login</a>
+                <button id="logoutBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors hidden">Logout</button>
+            </nav>
+            <button class="md:hidden text-white hover:text-blue-200">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-6 md:px-12 py-12">
+
+        <!-- Home Page -->
+        <div id="homePage" class="page-content active">
+            <div class="bg-blue-600 text-white rounded-xl shadow-lg p-8 md:p-16 mb-12 flex flex-col md:flex-row items-center gap-8">
+                <div class="md:w-1/2">
+                    <!-- Added BCA Logo -->
+                    <img src="https://placehold.co/100x100/ffffff/000000?text=BCA+SWARANDHRA" alt="BCA SWARANDHRA Logo" class="mb-4 mx-auto md:mx-0 w-24 h-24 rounded-full shadow-lg">
+                    <h2 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+                        Welcome to BCA SWARANDHRA.
+                    </h2>
+                    <p class="text-lg mb-6">
+                        Explore our world-class Bachelor of Computer Applications program and discover your future.
+                    </p>
+                    <a href="#" class="inline-block bg-white text-blue-600 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-100 transition-colors transform hover:scale-105">Learn More</a>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="download.jpeg" alt="SCET Logo" class="w-full h-auto rounded-lg shadow-md max-w-sm">
+                </div>
+            </div>
+
+            <section class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Academic Programs (I SEMESTER)</h3>
+                <p class="text-gray-600 mb-6">
+                    Our BCA program offers a comprehensive curriculum in core subjects to prepare you for a successful career.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Communicative English</h4>
+                        <p class="text-sm text-gray-500">AEC-1 | 24BC1T01</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Computer Fundamentals</h4>
+                        <p class="text-sm text-gray-500">VAC | 24BC1T02</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Fundamentals of Commerce</h4>
+                        <p class="text-sm text-gray-500">MD | 24BC1T03</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Digital Logic Design</h4>
+                        <p class="text-sm text-gray-500">CORE | 24BC1T04</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Programming in C</h4>
+                        <p class="text-sm text-gray-500">CORE | 24BC1T05</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">Numerical and Statistical Methods</h4>
+                        <p class="text-sm text-gray-500">MD | 24BC1T06</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Added new sections for rules and attendance -->
+            <section class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Award of B.C.A. Degree</h3>
+                <p class="text-gray-600 mb-2">
+                    <strong>2.1</strong> A student shall be declared eligible for the award of the B.C.A., Degree, if he pursues a course of study and completes it successfully in not less than **THREE** academic years and not more than **SIX** academic
+                    years.
+                </p>
+                <p class="text-gray-600 mb-2">
+                    <strong>2.2</strong> The student shall register for all 120 credits and secure all the 120 credits.
+                </p>
+                <p class="text-gray-600 mb-2">
+                    <strong>2.3</strong> The minimum instruction days in each semester are 90.
+                </p>
+                <p class="text-gray-600 mb-2">
+                    <strong>2.4</strong> A Student, who fails to fulfil all the academic requirements for the award of the degree within **SIX** academic years from the year of their admission, shall forfeit his seat in B.C.A., course.
+                </p>
+                <p class="text-gray-600 mb-2">
+                    <strong>2.5</strong> After successful completion of First three-year academic requirements a student can opt to **REGISTER** for B.C.A. (Hons) Degree by completing 40 more credits in the FOURTH YEAR.
+                </p>
+            </section>
+
+            <section class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Attendance Requirements</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li>
+                        A student shall be eligible to appear for the University external examinations if he/she acquires a minimum of **75%** of attendance in aggregate of all the subjects. Condonation of shortage of attendance in aggregate up to **10%** (65% and above and
+                        below 75%) in each semester may be granted by the College Academic Committee.
+                    </li>
+                    <li>
+                        Shortage of Attendance below **65%** in aggregate shall in NO CASE be condoned.
+                    </li>
+                    <li>
+                        A stipulated fee of **Rs 500/-** shall be payable towards condonation of shortage of attendance to the University.
+                    </li>
+                    <li>
+                        Students whose shortage of attendance is not condoned in any semester are not eligible to take their end examination of that class and their registration shall stand cancelled.
+                    </li>
+                    <li>
+                        A student will not be promoted to the next semester unless he satisfies the attendance requirements of the present semester. They may seek readmission for that semester from the date of commencement of class work.
+                    </li>
+                    <li>
+                        If any candidate fulfils the attendance requirement in the present semester, he shall not be eligible for readmission into the same class.
+                    </li>
+                    <li>
+                        If the learning is carried out in blended mode (both offline & online), then the total attendance of the student shall be calculated considering the offline and online attendance of the student.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- New section for University Campus -->
+            <section class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Swarandhra BCA</h3>
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2 flex justify-center">
+                        <img src="download.jpeg" alt="SCET Logo" class="w-full h-auto rounded-lg shadow-md max-w-sm">
+                    </div>
+                    <div class="md:w-1/2 text-gray-600">
+                        <p class="mb-4">
+                            Our state-of-the-art campus provides a vibrant learning environment with modern classrooms, well-equipped computer labs, and a comprehensive library. We believe that a conducive atmosphere is key to academic success and personal growth.
+                        </p>
+                        <p>
+                            Beyond academics, the campus offers a wide range of facilities including sports complexes, student clubs, and recreational areas, ensuring a holistic development experience for all students.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+
+        </div>
+
+        <!-- Student Dashboard Page -->
+        <div id="dashboardPage" class="page-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 md:p-12">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-blue-800 mb-6">
+                    Welcome, <span id="studentNameDisplay">Student</span>!
+                </h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    Here are your academic marks for the Mids.
+                </p>
+
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4">MID1 Marks</h3>
+                    <div id="mid1MarksDisplay" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- MID1 Marks will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4">MID2 Marks</h3>
+                    <div id="mid2MarksDisplay" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- MID2 Marks will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Page -->
+        <div id="adminPage" class="page-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 md:p-12">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-blue-800 mb-6">Admin Panel</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    Update student marks here.
+                </p>
+                <form id="adminForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="input-group">
+                        <label for="adminStudentSelect">Select Student</label>
+                        <select id="adminStudentSelect" class="w-full px-4 py-3 rounded-md border-gray-300"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="adminExamSelect">Select Exam</label>
+                        <select id="adminExamSelect" class="w-full px-4 py-3 rounded-md border-gray-300">
+                            <option value="mid1">MID1</option>
+                            <option value="mid2">MID2</option>
+                        </select>
+                    </div>
+                    <div class="input-group md:col-span-2">
+                        <label for="adminSubjectSelect">Select Subject</label>
+                        <select id="adminSubjectSelect" class="w-full px-4 py-3 rounded-md border-gray-300"></select>
+                    </div>
+                    <div class="input-group md:col-span-2">
+                        <label for="adminMarksInput">Marks (out of 30)</label>
+                        <input type="number" id="adminMarksInput" min="0" max="30" placeholder="Enter marks" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="login-button mt-4">Update Marks</button>
+                    </div>
+                </form>
+                <div id="adminMessage" class="mt-6 p-4 rounded-lg text-white font-semibold hidden"></div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="page-content hidden flex justify-center w-full">
+            <div class="login-container">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Login to BCA SWARANDHRA</h1>
+                    <p class="text-gray-500 text-sm">Sign in to view your marks or access the admin panel</p>
+                </div>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="email">Username</label>
+                        <input type="text" id="username" placeholder="Enter your username" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+
+                    <button type="submit" class="login-button">Sign In</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white py-6">
+        <div class="container mx-auto px-6 md:px-12 text-center">
+            <p>&copy; 2024 BCA SWARANDHRA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Message Box HTML -->
+    <div class="message-box-container" id="messageBoxContainer">
+        <div class="message-box">
+            <h4 id="messageBoxTitle"><i class="fas fa-exclamation-circle"></i> Error</h4>
+            <p id="messageBoxText">This is a placeholder message.</p>
+            <button id="messageBoxClose">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const navLinks = document.querySelectorAll('.nav-link');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const homePage = document.getElementById('homePage');
+        const dashboardPage = document.getElementById('dashboardPage');
+        const adminPage = document.getElementById('adminPage');
+        const loginPage = document.getElementById('loginPage');
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const studentNameDisplay = document.getElementById('studentNameDisplay');
+        const mid1MarksDisplay = document.getElementById('mid1MarksDisplay');
+        const mid2MarksDisplay = document.getElementById('mid2MarksDisplay');
+        const adminStudentSelect = document.getElementById('adminStudentSelect');
+        const adminExamSelect = document.getElementById('adminExamSelect');
+        const adminSubjectSelect = document.getElementById('adminSubjectSelect');
+        const adminMarksInput = document.getElementById('adminMarksInput');
+        const adminForm = document.getElementById('adminForm');
+        const adminMessage = document.getElementById('adminMessage');
+
+        // Message box elements
+        const messageBoxContainer = document.getElementById('messageBoxContainer');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxClose = document.getElementById('messageBoxClose');
+
+        // State variables
+        let currentUser = null;
+        let currentPage = 'home';
+
+        // Mock data for our "database"
+        let mockDatabase = {
+            users: [],
+            marks: {},
+            subjects: ['Communicative English', 'Computer Fundamentals', 'Fundamentals of Commerce', 'Digital Logic Design', 'Programming in C', 'Numerical and Statistical Methods']
+        };
+
+        // Function to generate 60 students and 6 admins
+        function generateMockData() {
+            // A list of random names to use for students
+            const studentNames = [
+                'Alex', 'Sarah', 'Michael', 'Emily', 'David', 'Jessica', 'Daniel', 'Lauren', 'Christopher', 'Megan',
+                'Matthew', 'Amanda', 'Andrew', 'Ashley', 'James', 'Brittany', 'Joshua', 'Elizabeth', 'Ryan', 'Stephanie',
+                'Jacob', 'Nicole', 'Nicholas', 'Kimberly', 'Tyler', 'Samantha', 'Brandon', 'Christina', 'Jonathan', 'Victoria',
+                'Zachary', 'Kayla', 'Justin', 'Melissa', 'Kevin', 'Jennifer', 'Eric', 'Michelle', 'Jason', 'Rachel',
+                'Mark', 'Courtney', 'Adam', 'Heather', 'Scott', 'Laura', 'Stephen', 'Vanessa', 'Timothy', 'Rebecca',
+                'Robert', 'Jessica', 'Kyle', 'Mary', 'William', 'Lisa', 'Thomas', 'Angela', 'Benjamin', 'Kelly'
+            ];
+
+            // Generate 60 student users
+            for (let i = 1; i <= 60; i++) {
+                const username = `bca_student_${i.toString().padStart(2, '0')}`;
+                const password = `bcapass${i}`;
+                mockDatabase.users.push({
+                    username: username,
+                    password: password,
+                    name: studentNames[i - 1], // Use a random name from the list
+                    role: 'student'
+                });
+                mockDatabase.marks[username] = {
+                    mid1: {},
+                    mid2: {}
+                };
+            }
+            // Generate 6 admin users
+            for (let i = 1; i <= 6; i++) {
+                mockDatabase.users.push({
+                    username: `admin_${i}`,
+                    password: `adminpass_${i}`,
+                    name: `Administrator ${i}`,
+                    role: 'admin'
+                });
+            }
+        }
+
+        // IMPORTANT: We'll remove the old data to ensure the new names are loaded.
+        localStorage.removeItem('bca_swarandhra_db');
+
+        // Initialize localStorage with mock data if it's not present
+        if (!localStorage.getItem('bca_swarandhra_db')) {
+            generateMockData();
+            localStorage.setItem('bca_swarandhra_db', JSON.stringify(mockDatabase));
+        } else {
+            mockDatabase = JSON.parse(localStorage.getItem('bca_swarandhra_db'));
+            // Ensure the 6 admin users with different passwords are set
+            let updatedAdmins = false;
+            for (let i = 1; i <= 6; i++) {
+                const username = `admin_${i}`;
+                const password = `adminpass_${i}`;
+                const adminExists = mockDatabase.users.find(u => u.username === username);
+                if (!adminExists || adminExists.password !== password) {
+                    // Remove existing admin if it doesn't match and add the new one
+                    mockDatabase.users = mockDatabase.users.filter(u => u.username !== username);
+                    mockDatabase.users.push({
+                        username: username,
+                        password: password,
+                        name: `Administrator ${i}`,
+                        role: 'admin'
+                    });
+                    updatedAdmins = true;
+                }
+            }
+            if (updatedAdmins) {
+                localStorage.setItem('bca_swarandhra_db', JSON.stringify(mockDatabase));
+            }
+        }
+
+        // --- Functions ---
+
+        // Function to show custom message box
+        function showMessageBox(message, isError = true) {
+            messageBoxTitle.innerHTML = isError ? `<i class="fas fa-exclamation-circle"></i> Error` : `<i class="fas fa-check-circle"></i> Success`;
+            messageBoxTitle.style.color = isError ? '#d9534f' : '#28a745';
+            messageBoxText.textContent = message;
+            messageBoxContainer.style.display = 'flex';
+            setTimeout(() => messageBoxContainer.classList.add('show'), 10);
+        }
+
+        // Close message box when "OK" is clicked
+        messageBoxClose.addEventListener('click', () => {
+            messageBoxContainer.classList.remove('show');
+            setTimeout(() => messageBoxContainer.style.display = 'none', 300);
+        });
+
+        // Function to render the correct page based on state
+        function renderPage() {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
+
+            // Show/hide navigation links based on user role
+            const dashboardLink = document.querySelector('[data-page="dashboard"]');
+            const adminLink = document.querySelector('[data-page="admin"]');
+            const loginLink = document.querySelector('[data-page="login"]');
+
+            dashboardLink.classList.add('hidden');
+            adminLink.classList.add('hidden');
+            loginLink.classList.remove('hidden');
+            logoutBtn.classList.add('hidden');
+
+            if (currentUser) {
+                if (currentUser.role === 'admin') {
+                    adminLink.classList.remove('hidden');
+                } else if (currentUser.role === 'student') {
+                    dashboardLink.classList.remove('hidden');
+                }
+                loginLink.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+            }
+
+            // Show the correct page
+            const pageToShow = document.getElementById(currentPage + 'Page');
+            if (pageToShow) {
+                pageToShow.classList.add('active');
+            } else {
+                homePage.classList.add('active');
+                currentPage = 'home';
+            }
+
+            updatePageContent();
+        }
+
+        // Function to update content based on the current page
+        function updatePageContent() {
+            if (currentPage === 'dashboard' && currentUser) {
+                renderStudentDashboard();
+            } else if (currentPage === 'admin' && currentUser) {
+                renderAdminPanel();
+            }
+        }
+
+        // Render student dashboard content
+        function renderStudentDashboard() {
+            const db = JSON.parse(localStorage.getItem('bca_swarandhra_db'));
+            const studentMarks = db.marks[currentUser.username] || {
+                mid1: {},
+                mid2: {}
+            };
+            studentNameDisplay.textContent = currentUser.name;
+            mid1MarksDisplay.innerHTML = ''; // Clear previous marks
+            mid2MarksDisplay.innerHTML = '';
+
+            // Render MID1 marks
+            const mid1Keys = Object.keys(studentMarks.mid1);
+            if (mid1Keys.length === 0) {
+                mid1MarksDisplay.innerHTML = '<p class="text-gray-500 italic">No MID1 marks have been entered yet.</p>';
+            } else {
+                mid1Keys.forEach(subject => {
+                    const marks = studentMarks.mid1[subject];
+                    const card = document.createElement('div');
+                    card.className = 'bg-blue-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow';
+                    card.innerHTML = `
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">${subject}</h4>
+                        <p class="text-sm text-gray-500">Marks: <span class="text-blue-900 font-bold text-xl">${marks}</span>/30</p>
+                    `;
+                    mid1MarksDisplay.appendChild(card);
+                });
+            }
+
+            // Render MID2 marks
+            const mid2Keys = Object.keys(studentMarks.mid2);
+            if (mid2Keys.length === 0) {
+                mid2MarksDisplay.innerHTML = '<p class="text-gray-500 italic">No MID2 marks have been entered yet.</p>';
+            } else {
+                mid2Keys.forEach(subject => {
+                    const marks = studentMarks.mid2[subject];
+                    const card = document.createElement('div');
+                    card.className = 'bg-blue-50 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow';
+                    card.innerHTML = `
+                        <h4 class="font-semibold text-lg text-blue-700 mb-2">${subject}</h4>
+                        <p class="text-sm text-gray-500">Marks: <span class="text-blue-900 font-bold text-xl">${marks}</span>/30</p>
+                    `;
+                    mid2MarksDisplay.appendChild(card);
+                });
+            }
+        }
+
+        // Render admin panel content
+        function renderAdminPanel() {
+            const db = JSON.parse(localStorage.getItem('bca_swarandhra_db'));
+            adminStudentSelect.innerHTML = '';
+            adminSubjectSelect.innerHTML = '';
+
+            // Populate student dropdown
+            const students = db.users.filter(user => user.role === 'student');
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.username;
+                option.textContent = student.name;
+                adminStudentSelect.appendChild(option);
+            });
+
+            // Populate subject dropdown
+            db.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                adminSubjectSelect.appendChild(option);
+            });
+        }
+
+        // --- Event Listeners ---
+
+        // Navigation links click handler
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.dataset.page;
+
+                if (page === 'dashboard' && (!currentUser || currentUser.role !== 'student')) {
+                    showMessageBox('You do not have permission to view this page.');
+                    return;
+                }
+
+                if (page === 'admin' && (!currentUser || currentUser.role !== 'admin')) {
+                    showMessageBox('You do not have permission to view this page.');
+                    return;
+                }
+
+                currentPage = page;
+                renderPage();
+            });
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            const db = JSON.parse(localStorage.getItem('bca_swarandhra_db'));
+            const user = db.users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                if (currentUser.role === 'student') {
+                    currentPage = 'dashboard';
+                } else if (currentUser.role === 'admin') {
+                    currentPage = 'admin';
+                }
+                showMessageBox('Login successful! Welcome.', false);
+                setTimeout(() => {
+                    renderPage();
+                }, 1000);
+            } else {
+                showMessageBox('Invalid username or password. Please try again.');
+            }
+        });
+
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            currentPage = 'home';
+            renderPage();
+            showMessageBox('You have been logged out successfully.', false);
+        });
+
+        // Admin form submission to update marks
+        adminForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentUsername = adminStudentSelect.value;
+            const exam = adminExamSelect.value;
+            const subject = adminSubjectSelect.value;
+            const marks = parseInt(adminMarksInput.value, 10);
+
+            if (isNaN(marks) || marks < 0 || marks > 30) {
+                showMessageBox('Please enter a valid mark between 0 and 30.');
+                return;
+            }
+
+            const db = JSON.parse(localStorage.getItem('bca_swarandhra_db'));
+            db.marks[studentUsername][exam][subject] = marks;
+            localStorage.setItem('bca_swarandhra_db', JSON.stringify(db));
+
+            adminMessage.textContent = `Marks for ${studentUsername} in ${exam.toUpperCase()} (${subject}) updated successfully!`;
+            adminMessage.className = 'mt-6 p-4 rounded-lg bg-green-500 text-white font-semibold';
+            adminMessage.style.display = 'block';
+
+            setTimeout(() => adminMessage.style.display = 'none', 3000);
+        });
+
+        // Initial render
+        renderPage();
+    </script>
+</body>
+
+</html>
